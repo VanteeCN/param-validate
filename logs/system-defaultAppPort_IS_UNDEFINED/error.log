@@ -545,3 +545,17 @@ Caused by: java.lang.ClassNotFoundException: org.aspectj.weaver.tools.PointcutPr
 2020-08-09 15:49:03 ERROR [ServerExceptionResolver:35] 参数【用户名】的请求数据不符合规则
 2020-08-09 15:49:30 ERROR [MyAssert:24] 参数【用户名】的请求数据不符合规则
 2020-08-09 15:49:30 ERROR [ServerExceptionResolver:35] 参数【用户名】的请求数据不符合规则
+2020-08-09 21:43:55 ERROR [org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter:40] 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+The bean 'serverExceptionResolver' could not be registered. A bean with that name has already been defined in file [D:\Code\param-validate\target\classes\cn\rayfoo\validate\exception\ServerExceptionResolver.class] and overriding is disabled.
+
+Action:
+
+Consider renaming one of the beans or enabling overriding by setting spring.main.allow-bean-definition-overriding=true
+
