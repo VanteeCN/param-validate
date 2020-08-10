@@ -27,6 +27,68 @@
 
 
 
+Param-Validate基于SpringBoot2.3.0.RELEASE，所以请保证你的SpringBoot版本和其一致，如果必须使用其他版本，可以将其内包含的SpringBoot依赖排除。
+
+
+
+### 依赖
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.18338862369</groupId>
+    <artifactId>param-validate</artifactId>
+    <version>1.0.0</version>
+    <description>SpringBoot ParamValidate</description>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.0.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <aspectjweaver.version>1.9.5</aspectjweaver.version>
+        <lombok.version>1.18.12</lombok.version>
+    </properties>
+
+
+    <dependencies>
+        <!--web内置了jackson-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+        <!-- aspect -->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectjweaver.version}</version>
+        </dependency>
+        <!-- lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+<!--            <optional>true</optional>-->
+            <version>${lombok.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>
+```
+
+
+
 ### 项目结构
 
 下图是项目的结构图。接下来，我们逐个包来介绍一下
