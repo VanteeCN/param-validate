@@ -1027,9 +1027,9 @@ public enum RegexOption {
 - isEntity：是否是一个entity，如果是，递归调用判断其内的属性
 
 ```java
-package cn.rayfoo.validate.annotation;
+package com.github.validate.annotation;
 
-import RegexOption;
+import com.github.validate.enums.RegexOption;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -1051,6 +1051,9 @@ public @interface Verify {
 
     /** 参数最大长度 */
     int maxLength() default Integer.MAX_VALUE;
+
+    /*** 是否是实体，如果是，继续判断其内部的值 */
+    boolean isEntity() default false;
 
     /** 是否必填 这里只是判断是否为null */
     boolean required() default true;
