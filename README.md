@@ -733,7 +733,7 @@ public class Result<T> {
 ```java
 package cn.rayfoo.validate.exception;
 
-import cn.rayfoo.validate.response.HttpStatus;
+import HttpStatus;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -824,8 +824,8 @@ public class MyException extends RuntimeException{
 ```java
 package cn.rayfoo.validate.exception;
 
-import cn.rayfoo.validate.response.HttpStatus;
-import cn.rayfoo.validate.response.Result;
+import HttpStatus;
+import Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -962,11 +962,12 @@ public enum RegexOption {
 - required：是否为必填属性
 - notNull：是否允许为空
 - regular：是否需要进行正则校验，如果需要正则内容是什么，默认为不进行正则校验
+- isEntity：是否是一个entity，如果是，递归调用判断其内的属性
 
 ```java
 package cn.rayfoo.validate.annotation;
 
-import cn.rayfoo.validate.enums.RegexOption;
+import RegexOption;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -1075,7 +1076,7 @@ public @interface RequestEntity {
 ```java
 package cn.rayfoo.validate.annotation;
 
-import cn.rayfoo.validate.config.EnableVerifyConfig;
+import EnableVerifyConfig;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -1110,8 +1111,8 @@ public @interface EnableVerify {
 ```java
 package cn.rayfoo.validate.config;
 
-import cn.rayfoo.validate.annotation.EnableVerify;
-import cn.rayfoo.validate.aspect.ValidateAdvice;
+import EnableVerify;
+import ValidateAdvice;
 import org.springframework.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -1185,13 +1186,13 @@ public class EnableVerifyConfig implements ImportBeanDefinitionRegistrar{
 最后就是此篇文章的重中之重了，所有的注解解析和参数校验都是在这个类中完成的，其主要使用了前置通知，在通知中获取目标方法，通过反射拿到目标方法的参数，根据方法参数的类型再选择进行何种判断。
 
 ```java
-package cn.rayfoo.validate.aspect;
+package com.github.validate.aspect;
 
 
-import cn.rayfoo.validate.annotation.RequestEntity;
-import cn.rayfoo.validate.annotation.RequestMap;
-import cn.rayfoo.validate.annotation.Verify;
-import cn.rayfoo.validate.exception.MyAssert;
+import com.github.validate.annotation.RequestEntity;
+import com.github.validate.annotation.RequestMap;
+import com.github.validate.annotation.Verify;
+import com.github.validate.exception.MyAssert;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
@@ -1223,7 +1224,7 @@ public class ValidateAdvice implements MethodInterceptor {
         //获取参数上的所有注解
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         //获取参数列表
-        Object[] args = method.getParameters();
+        Object[] args = invocation.getArguments();
         //判断是否加了RequestMap注解
         for (Annotation[] parameterAnnotation : parameterAnnotations) {
             //获取当前参数的位置
@@ -1258,27 +1259,38 @@ public class ValidateAdvice implements MethodInterceptor {
         String name = annotation.annotationType().getName();
         //匹配是否相同
         if (requestEntityName.equals(name)) {
-            //获取参数的字节码
-            Class clazz = param.getClass();
-            //获取当前参数对应类型的所有属性
-            Field[] fields = clazz.getDeclaredFields();
-            //遍历属性
-            for (Field field : fields) {
-                //获取私有属性值
-                field.setAccessible(true);
-                //需要做校验的参数
-                if (field.isAnnotationPresent(Verify.class)) {
-                    //获取注解对象
-                    Verify verify = field.getAnnotation(Verify.class);
-                    //校验的对象
-                    Object fieldObj = field.get(param);
-                    //校验
-                    validate(verify, fieldObj);
-                }
-            }
+            //是否是实体类
+            isEntity(param);
         }
     }
 
+    /**
+     * 递归判断是否存在实体属性
+     * @param entity 判断的内容
+     */
+    public void isEntity(Object entity) throws Exception {
+        //获取其内部的所有属性
+        Field[] fields = entity.getClass().getDeclaredFields();
+        //遍历属性
+        for (Field field : fields) {
+            //获取私有属性值
+            field.setAccessible(true);
+            //需要做校验的参数
+            if (field.isAnnotationPresent(Verify.class)) {
+                //获取注解对象
+                Verify verify = field.getAnnotation(Verify.class);
+                //校验的对象
+                Object fieldObj = field.get(entity);
+                //如果这个属性是一个实体
+                if (verify.isEntity()) {
+                    //递归调用
+                    isEntity(fieldObj);
+                }
+                //校验
+                validate(verify, fieldObj);
+            }
+        }
+    }
 
     /**
      * 如果参数上加的是Verify注解
@@ -1427,9 +1439,9 @@ public class ValidateAdvice implements MethodInterceptor {
     /**
      * hutool中的方法
      */
-    private  <T> int indexOf(T[] array, Object value) {
+    private <T> int indexOf(T[] array, Object value) {
         if (null != array) {
-            for(int i = 0; i < array.length; ++i) {
+            for (int i = 0; i < array.length; ++i) {
                 if (equal(value, array[i])) {
                     return i;
                 }
@@ -1481,7 +1493,7 @@ mvn install:install-file -Dfile=%~dp0param-validate-1.0.0.jar -DgroupId=com.gith
 ```java
 package cn.rayfoo;
 
-import cn.rayfoo.validate.annotation.EnableVerify;
+import EnableVerify;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -1508,8 +1520,8 @@ public class Runner {
 ```java
 package cn.rayfoo.web;
 
-import cn.rayfoo.validate.annotation.Verify;
-import cn.rayfoo.validate.enums.RegexOption;
+import Verify;
+import RegexOption;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
