@@ -43,7 +43,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-<!--            <optional>true</optional>-->
+            <optional>true</optional>
+            <scope>provided</scope>
             <version>${lombok.version}</version>
         </dependency>
     </dependencies>
